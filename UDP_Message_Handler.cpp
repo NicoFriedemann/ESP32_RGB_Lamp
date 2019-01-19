@@ -49,15 +49,15 @@ float UDP_Message_Handler::get_next_element_udp_msg(String & msg)
 	return out;
 }
 
-void UDP_Message_Handler::handle_udp_cmd_msg(udp_message udp_msg)
+void UDP_Message_Handler::parse_udp_cmd_msg(udp_message udp_msg)
 {
-	debug_print("UDP_Message_Handler::handle_udp_cmd_msg - run");
+	debug_print("UDP_Message_Handler::parse_udp_cmd_msg - run");
 	e_udpmsg_cmd cmd;
 	e_udpmsg_parname par_name;
 	float par_val = 0;
 	if (validate_command_udpmsg(udp_msg.msg))
 	{
-		debug_print("UDP_Message_Handler::handle_udp_cmd_msg - invalid udpmsg:" + udp_msg.msg);
+		debug_print("UDP_Message_Handler::parse_udp_cmd_msg - invalid udpmsg:" + udp_msg.msg);
 		return;
 	}
 	cmd = (e_udpmsg_cmd)int(get_next_element_udp_msg(udp_msg.msg));
@@ -65,7 +65,7 @@ void UDP_Message_Handler::handle_udp_cmd_msg(udp_message udp_msg)
 	switch (cmd)
 	{
 	case change_prog:
-		debug_print("UDP_Message_Handler::handle_udp_cmd_msg - change prog");
+		debug_print("UDP_Message_Handler::parse_udp_cmd_msg - change prog");
 		par_name = (e_udpmsg_parname)int(get_next_element_udp_msg(udp_msg.msg));
 		if (par_name == program_number)
 		{
@@ -74,7 +74,7 @@ void UDP_Message_Handler::handle_udp_cmd_msg(udp_message udp_msg)
 		}
 		break;
 	case change_color:
-		debug_print("UDP_Message_Handler::handle_udp_cmd_msg - change color");
+		debug_print("UDP_Message_Handler::parse_udp_cmd_msg - change color");
 		do
 		{
 			par_name = (e_udpmsg_parname)int(get_next_element_udp_msg(udp_msg.msg));
@@ -86,39 +86,41 @@ void UDP_Message_Handler::handle_udp_cmd_msg(udp_message udp_msg)
 			case red:
 				if (_prog_nmbr != e_prog_nmbr::man_pc_rgb)
 				{ 
-					debug_print("UDP_Message_Handler::handle_udp_cmd_msg - error -> changed red -> prog:" + String(_prog_nmbr)); 
+					debug_print("UDP_Message_Handler::parse_udp_cmd_msg - error -> changed red -> prog:" + String(_prog_nmbr)); 
 				}
 				_rgb_colors_man[0] = _rgb_util.check_rgb(_LED_MAX_RGB_VALUE - int(par_val));
 				break;
 			case green:
 				if (_prog_nmbr != e_prog_nmbr::man_pc_rgb)
 				{ 
-					debug_print("UDP_Message_Handler::handle_udp_cmd_msg - error -> changed green -> prog:" + String(_prog_nmbr)); 
+					debug_print("UDP_Message_Handler::parse_udp_cmd_msg - error -> changed green -> prog:" + String(_prog_nmbr)); 
 				}
 				_rgb_colors_man[1] = _rgb_util.check_rgb(_LED_MAX_RGB_VALUE - int(par_val));
 				break;
 			case blue:
 				if (_prog_nmbr != e_prog_nmbr::man_pc_rgb)
 				{
-					debug_print("UDP_Message_Handler::handle_udp_cmd_msg - error -> changed blue -> prog:" + String(_prog_nmbr));
+					debug_print("UDP_Message_Handler::parse_udp_cmd_msg - error -> changed blue -> prog:" + String(_prog_nmbr));
 				}
 				_rgb_colors_man[2] = _rgb_util.check_rgb(_LED_MAX_RGB_VALUE - int(par_val));
 				break;
 			case hue:
-				if (_prog_nmbr != e_prog_nmbr::man_pc_hsv) { debug_print("UDP_Message_Handler::handle_udp_cmd_msg - error -> changed hue -> prog:" + String(_prog_nmbr)); }
+				if (_prog_nmbr != e_prog_nmbr::man_pc_hsv) { 
+					debug_print("UDP_Message_Handler::parse_udp_cmd_msg - error -> changed hue -> prog:" + String(_prog_nmbr));
+				}
 				_hsv_colors_man[0] = _rgb_util.check_hsv(par_val, e_udpmsg_parname::hue);
 				break;
 			case saturation:
 				if (_prog_nmbr != e_prog_nmbr::man_pc_hsv)
 				{
-					debug_print("UDP_Message_Handler::handle_udp_cmd_msg - error -> changed saturation -> prog:" + String(_prog_nmbr));
+					debug_print("UDP_Message_Handler::parse_udp_cmd_msg - error -> changed saturation -> prog:" + String(_prog_nmbr));
 				}
 				_hsv_colors_man[1] = _rgb_util.check_hsv(par_val, e_udpmsg_parname::saturation);
 				break;
 			case value:
 				if (_prog_nmbr != e_prog_nmbr::man_pc_hsv)
 				{
-					debug_print("UDP_Message_Handler::handle_udp_cmd_msg - error -> changed value -> prog:" + String(_prog_nmbr));
+					debug_print("UDP_Message_Handler::parse_udp_cmd_msg - error -> changed value -> prog:" + String(_prog_nmbr));
 				}
 				_hsv_colors_man[2] = _rgb_util.check_hsv(par_val, e_udpmsg_parname::value);
 				break;
@@ -130,8 +132,13 @@ void UDP_Message_Handler::handle_udp_cmd_msg(udp_message udp_msg)
 	case add_msg_receiver:
 		add_udp_msg_receiver(udp_msg.udp_rec);
 	default:
-		debug_print("UDP_Message_Handler::handle_udp_cmd_msg - invalid cmd:" + String(cmd));
+		debug_print("UDP_Message_Handler::parse_udp_cmd_msg - invalid cmd:" + String(cmd));
 		break;
 	}
 	set_program(_prog_nmbr,_rgb_colors_man,_hsv_colors_man);
+}
+
+String UDP_Message_Handler::generate_udp_debug_msg(String header, String msg)
+{
+	return "|" + header + " | " + msg + " |";
 }

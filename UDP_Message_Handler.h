@@ -1,13 +1,14 @@
 #pragma once
 #include "Enums.h"
-#include "UDP_Connection.h"
+#include "UDP_Handler.h"
 #include "RGB_Utils.h"
 
 class UDP_Message_Handler {
 public:
 	UDP_Message_Handler(void (*debug_print_fncptr)(String), void (*set_program_fncptr)(e_prog_nmbr, int[3], float[3]),
 		void(*add_udp_msg_receiver_fncptr)(udp_receiver), int LED_MAX_RGB_VALUE);
-	void handle_udp_cmd_msg(udp_message msg);
+	void parse_udp_cmd_msg(udp_message msg);
+	static String generate_udp_debug_msg(String header, String msg);
 
 private:
 	bool validate_command_udpmsg(String msg);

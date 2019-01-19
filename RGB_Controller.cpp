@@ -74,10 +74,10 @@ void RGB_Controller::check_I2C_watchdog()
 			_watchdog_fail_counts = 0;
 			set_esp32_statusled_on();
 			_watchdog_state_check = state_watchdog_pin;
-			debug_print("check_watchdog : ok");
+			debug_print("RGB_Controller::check_watchdog - ok");
 		}
 		else {
-			debug_print("check_watchdog : failed");
+			debug_print("RGB_Controller::check_watchdog - failed");
 			_watchdog_fail_counts++;
 		}
 		_watchdog_last_change = millis();

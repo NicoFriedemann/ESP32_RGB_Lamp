@@ -36,7 +36,7 @@
     <ClInclude Include="UDP_Message_Handler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="UDP_Connection.h">
+    <ClInclude Include="UDP_Handler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -53,7 +53,7 @@
     <ClCompile Include="UDP_Message_Handler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="UDP_Connection.cpp">
+    <ClCompile Include="UDP_Handler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -3,7 +3,6 @@
 
 UDP_Handler::UDP_Handler(void(*debug_print_fncptr)(String), WiFiClass &wifi, int udp_receive_port)
 {
-	_MAX_UDP_CLIENTS = 4;
 	debug_print = debug_print_fncptr;
 	_wifi = wifi;
 	_udp_port_receive = udp_receive_port;
@@ -14,7 +13,7 @@ UDP_Handler::UDP_Handler(void(*debug_print_fncptr)(String), WiFiClass &wifi, int
 void UDP_Handler::add_udp_msg_receiver(udp_receiver udp_rec)
 {
 	debug_print("UDP_Connection::add_udp_msg_receiver - run");
-	for (int i = 0; i <= (_MAX_UDP_CLIENTS - 1); i++)
+	for (int i = 0; i <= (MAX_UDP_CLIENTS - 1); i++)
 	{
 		//receiver already registered?
 		if (_receiver_list[i].udp_ipaddress_partner != udp_rec.udp_ipaddress_partner) {
@@ -62,7 +61,7 @@ void UDP_Handler::send_udp_msg(String header, String msg)
 	{
 		String _msg = UDP_Message_Handler::generate_udp_debug_msg(header, msg);
 		const char *c = _msg.c_str();
-		for (int i = 0; i <= (_MAX_UDP_CLIENTS - 1); i++)
+		for (int i = 0; i <= (MAX_UDP_CLIENTS - 1); i++)
 		{
 			if (_receiver_list[i].is_active) {
 				const char* udp_address_partner = _receiver_list[i].udp_ipaddress_partner.c_str();

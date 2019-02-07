@@ -3,8 +3,7 @@
 
 class RGB_Utils {
 public:
-	RGB_Utils(int LED_MAX_RGB_VALUE);
-	RGB_Utils() { _LED_MAX_RGB_VALUE = 4095; };
+	RGB_Utils();
 
 	struct s_hsv {
 		float h;       // angle in degrees
@@ -25,6 +24,6 @@ public:
 	struct s_hsv convert_rgb2hsv(struct s_rgb in);
 	void get_rgb(float hue, float sat, float val, int colors[3]);
 private:
-	int _LED_MAX_RGB_VALUE;
+
 };
 

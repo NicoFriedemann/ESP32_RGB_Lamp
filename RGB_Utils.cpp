@@ -1,14 +1,14 @@
 #include <math.h>
 #include "RGB_Utils.h"
 
-RGB_Utils::RGB_Utils(int LED_MAX_RGB_VALUE)
+
+RGB_Utils::RGB_Utils()
 {
-	_LED_MAX_RGB_VALUE = LED_MAX_RGB_VALUE;
 }
 
 int RGB_Utils::check_rgb(int val)
 {
-	if (val > _LED_MAX_RGB_VALUE) { return _LED_MAX_RGB_VALUE; }
+	if (val > LED_MAX_RGB_VALUE) { return LED_MAX_RGB_VALUE; }
 	else if (val < 0) { return 0; }
 	else { return val; }
 }
@@ -148,10 +148,10 @@ void RGB_Utils::get_rgb(float hue, float sat, float val, int colors[3])
 	_hsv.s = check_hsv(sat, e_udpmsg_parname::saturation);
 	_hsv.v = check_hsv(val, e_udpmsg_parname::value);
 	_rgb = convert_hsv2rgb(_hsv);
-	if (_rgb.r > 0.0) { colors[0] = _rgb.r * _LED_MAX_RGB_VALUE; }
+	if (_rgb.r > 0.0) { colors[0] = _rgb.r * LED_MAX_RGB_VALUE; }
 	else { colors[0] = 0; }
-	if (_rgb.g > 0.0) { colors[1] = _rgb.g * _LED_MAX_RGB_VALUE; }
+	if (_rgb.g > 0.0) { colors[1] = _rgb.g * LED_MAX_RGB_VALUE; }
 	else { colors[1] = 0; }
-	if (_rgb.b > 0.0) { colors[2] = _rgb.b * _LED_MAX_RGB_VALUE; }
+	if (_rgb.b > 0.0) { colors[2] = _rgb.b * LED_MAX_RGB_VALUE; }
 	else { colors[2] = 0; }
 }

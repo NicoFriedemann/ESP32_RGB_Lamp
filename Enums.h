@@ -51,3 +51,8 @@ enum e_udpmsg_parname {
 	value,
 	element_count_udpmsg_parname,
 };
+
+const int LED_MAX_RGB_VALUE = 4095;
+const int MAX_UDP_CLIENTS = 4;
+
+

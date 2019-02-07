@@ -1,14 +1,13 @@
 #include "UDP_Message_Handler.h"
 
 UDP_Message_Handler::UDP_Message_Handler(void(*debug_print_fncptr)(String), void(*set_program_fncptr)(e_prog_nmbr, int[3], float[3]),
-	void(*add_udp_msg_receiver_fncptr)(udp_receiver),int LED_MAX_RGB_VALUE)
+	void(*add_udp_msg_receiver_fncptr)(udp_receiver))
 {
 	debug_print = debug_print_fncptr;
 	set_program = set_program_fncptr;
 	add_udp_msg_receiver = add_udp_msg_receiver_fncptr;
 	_prog_nmbr = auto1;
-	_rgb_util = RGB_Utils(LED_MAX_RGB_VALUE);
-	_LED_MAX_RGB_VALUE = LED_MAX_RGB_VALUE;
+	_rgb_util = RGB_Utils();
 	debug_print("UDP_Message_Handler::UDP_Message_Handler - constructor");
 }
 
@@ -88,21 +87,21 @@ void UDP_Message_Handler::parse_udp_cmd_msg(udp_message udp_msg)
 				{ 
 					debug_print("UDP_Message_Handler::parse_udp_cmd_msg - error -> changed red -> prog:" + String(_prog_nmbr)); 
 				}
-				_rgb_colors_man[0] = _rgb_util.check_rgb(_LED_MAX_RGB_VALUE - int(par_val));
+				_rgb_colors_man[0] = _rgb_util.check_rgb(LED_MAX_RGB_VALUE - int(par_val));
 				break;
 			case green:
 				if (_prog_nmbr != e_prog_nmbr::man_pc_rgb)
 				{ 
 					debug_print("UDP_Message_Handler::parse_udp_cmd_msg - error -> changed green -> prog:" + String(_prog_nmbr)); 
 				}
-				_rgb_colors_man[1] = _rgb_util.check_rgb(_LED_MAX_RGB_VALUE - int(par_val));
+				_rgb_colors_man[1] = _rgb_util.check_rgb(LED_MAX_RGB_VALUE - int(par_val));
 				break;
 			case blue:
 				if (_prog_nmbr != e_prog_nmbr::man_pc_rgb)
 				{
 					debug_print("UDP_Message_Handler::parse_udp_cmd_msg - error -> changed blue -> prog:" + String(_prog_nmbr));
 				}
-				_rgb_colors_man[2] = _rgb_util.check_rgb(_LED_MAX_RGB_VALUE - int(par_val));
+				_rgb_colors_man[2] = _rgb_util.check_rgb(LED_MAX_RGB_VALUE - int(par_val));
 				break;
 			case hue:
 				if (_prog_nmbr != e_prog_nmbr::man_pc_hsv) { 

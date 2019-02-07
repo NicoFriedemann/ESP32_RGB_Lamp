@@ -6,7 +6,7 @@
 class RGB_Controller {
 public:
 	RGB_Controller(void (*debug_print_fncptr)(String), void (*own_delay_fncptr)(int),int WATCHDOG_PIN_ESP32,int WATCHDOG_PIN_PWMBOARD,int BUILTIN_LED_ESP32,
-		int LED1_PIN_RED,int LED1_PIN_GREEN,int LED1_PIN_BLUE,int LED2_PIN_RED,int LED2_PIN_GREEN,int LED2_PIN_BLUE,int LED_MAX_RGB_VALUE);
+		int LED1_PIN_RED,int LED1_PIN_GREEN,int LED1_PIN_BLUE,int LED2_PIN_RED,int LED2_PIN_GREEN,int LED2_PIN_BLUE);
 	void cyclic_tasks();
 	void set_program(e_prog_nmbr program_number, int rgb_colors_man[3], float hsv_colors_man[3]);
 	void set_program(e_prog_nmbr program_number);
@@ -43,15 +43,14 @@ private:
 	bool _watchdog_state_check;
 	int _watchdog_last_change;
 	int _watchdog_fail_counts;
-	int _WATCHDOG_PIN_ESP32;
-	int _WATCHDOG_PIN_PWMBOARD;
-	int _BUILTIN_LED_ESP32;
-	int _LED1_PIN_RED;
-	int _LED1_PIN_GREEN;
-	int _LED1_PIN_BLUE;
-	int _LED2_PIN_RED;
-	int _LED2_PIN_GREEN;
-	int _LED2_PIN_BLUE;
-	int _LED_MAX_RGB_VALUE;
+	int _watchdog_pin_esp32;
+	int _watchdog_pin_pwmboard;
+	int _builtin_led_esp32;
+	int _led1_pin_red;
+	int _led1_pin_green;
+	int _led1_pin_blue;
+	int _led2_pin_red;
+	int _led2_pin_green;
+	int _led2_pin_blue;
 };
 

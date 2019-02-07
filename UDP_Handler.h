@@ -39,6 +39,5 @@ private:
 	WiFiClass _wifi;
 	int _udp_port_receive;
 	boolean _udp_receiver_started;
-	int _MAX_UDP_CLIENTS;
 	udp_receiver _receiver_list[4] = { udp_receiver(), udp_receiver(), udp_receiver(), udp_receiver() };
 };

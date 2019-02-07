@@ -25,8 +25,8 @@ void setup() {
 		delay(1000);
 	}
 	udp_handler = new UDP_Handler(&debug_print, WiFi,11001);
-	rgb = new RGB_Controller(&debug_print, &own_delay, 4, 0, 2, 1, 2, 3, 4, 5, 6, 4095);
-	udp_msg_handler = new UDP_Message_Handler(&debug_print, &set_program, &add_udp_msg_receiver, 4095);
+	rgb = new RGB_Controller(&debug_print, &own_delay, 4, 0, 2, 1, 2, 3, 4, 5, 6);
+	udp_msg_handler = new UDP_Message_Handler(&debug_print, &set_program, &add_udp_msg_receiver);
 	
 	if (connect_wlan()==wl_status_t::WL_CONNECTED)
 	{

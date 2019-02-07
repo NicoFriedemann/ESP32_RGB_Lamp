@@ -2,20 +2,19 @@
 
 RGB_Controller::RGB_Controller(void (*debug_print_fncptr)(String), void (*own_delay_fncptr)(int), int WATCHDOG_PIN_ESP32, 
 	int WATCHDOG_PIN_PWMBOARD, int BUILTIN_LED_ESP32,int LED1_PIN_RED, int LED1_PIN_GREEN, int LED1_PIN_BLUE, 
-	int LED2_PIN_RED, int LED2_PIN_GREEN, int LED2_PIN_BLUE, int LED_MAX_RGB_VALUE)
+	int LED2_PIN_RED, int LED2_PIN_GREEN, int LED2_PIN_BLUE)
 {
 	debug_print = debug_print_fncptr;
 	own_delay = own_delay_fncptr;
-	_WATCHDOG_PIN_ESP32 = WATCHDOG_PIN_ESP32;
-	_WATCHDOG_PIN_PWMBOARD = WATCHDOG_PIN_PWMBOARD;
-	_BUILTIN_LED_ESP32 = BUILTIN_LED_ESP32;
-	_LED1_PIN_RED = LED1_PIN_RED;
-	_LED1_PIN_GREEN = LED1_PIN_GREEN;
-	_LED1_PIN_BLUE = LED1_PIN_BLUE;
-	_LED2_PIN_RED = LED2_PIN_RED;
-	_LED2_PIN_GREEN = LED2_PIN_GREEN;
-	_LED2_PIN_BLUE = LED2_PIN_BLUE;
-	_LED_MAX_RGB_VALUE = LED_MAX_RGB_VALUE;
+	_watchdog_pin_esp32 = WATCHDOG_PIN_ESP32;
+	_watchdog_pin_pwmboard = WATCHDOG_PIN_PWMBOARD;
+	_builtin_led_esp32 = BUILTIN_LED_ESP32;
+	_led1_pin_red = LED1_PIN_RED;
+	_led1_pin_green = LED1_PIN_GREEN;
+	_led1_pin_blue = LED1_PIN_BLUE;
+	_led2_pin_red = LED2_PIN_RED;
+	_led2_pin_green = LED2_PIN_GREEN;
+	_led2_pin_blue = LED2_PIN_BLUE;
 	_watchdog_refresh_state = false;
 	_watchdog_refresh_last_change = 0;
 	_watchdog_state_check = false;
@@ -24,9 +23,9 @@ RGB_Controller::RGB_Controller(void (*debug_print_fncptr)(String), void (*own_de
 	watchdog_state = e_watchdog_state::ok;
 	_pwm = Adafruit_PWMServoDriver();
 	_pwm.begin();
-	_rgb_util = RGB_Utils(LED_MAX_RGB_VALUE);
-	pinMode(_BUILTIN_LED_ESP32, OUTPUT);
-	pinMode(_WATCHDOG_PIN_ESP32, INPUT);
+	_rgb_util = RGB_Utils();
+	pinMode(_builtin_led_esp32, OUTPUT);
+	pinMode(_watchdog_pin_esp32, INPUT);
 	randomSeed(analogRead(22));
 	clear_I2C_outputs();
 	debug_print("RGB_Controller::RGB_Controller - constructor");
@@ -51,11 +50,11 @@ void RGB_Controller::refresh_I2C_watchdog()
 	debug_print("RGB_Controller::refresh_I2C_watchdog - run");
 	if (_watchdog_refresh_last_change <= (millis() - 1000)) {
 		if (_watchdog_refresh_state) {
-			_pwm.setPWM(_WATCHDOG_PIN_PWMBOARD, 0, 0);
+			_pwm.setPWM(_watchdog_pin_pwmboard, 0, 0);
 			_watchdog_refresh_state = false;
 		}
 		else {
-			_pwm.setPWM(_WATCHDOG_PIN_PWMBOARD, 0, _LED_MAX_RGB_VALUE);
+			_pwm.setPWM(_watchdog_pin_pwmboard, 0, LED_MAX_RGB_VALUE);
 			_watchdog_refresh_state = true;
 		}
 		_watchdog_refresh_last_change = millis();
@@ -68,7 +67,7 @@ void RGB_Controller::check_I2C_watchdog()
 {
 	debug_print("RGB_Controller::check_I2C_watchdog - run");
 	if (_watchdog_last_change <= (millis() - 1000)) {
-		int state_watchdog_pin = digitalRead(_WATCHDOG_PIN_ESP32);
+		int state_watchdog_pin = digitalRead(_watchdog_pin_esp32);
 		if (state_watchdog_pin != _watchdog_state_check) {
 			watchdog_state = e_watchdog_state::ok;
 			_watchdog_fail_counts = 0;
@@ -90,39 +89,39 @@ void RGB_Controller::check_I2C_watchdog()
 void RGB_Controller::clear_I2C_outputs()
 {
 	debug_print("RGB_Controller::clear_I2C_outputs - run");
-	digitalWrite(_BUILTIN_LED_ESP32, LOW);
-	_pwm.setPin(_WATCHDOG_PIN_PWMBOARD, _LED_MAX_RGB_VALUE);
-	_pwm.setPin(_LED1_PIN_RED, _LED_MAX_RGB_VALUE);
-	_pwm.setPin(_LED1_PIN_GREEN, _LED_MAX_RGB_VALUE);
-	_pwm.setPin(_LED1_PIN_BLUE, _LED_MAX_RGB_VALUE);
-	_pwm.setPin(_LED2_PIN_RED, _LED_MAX_RGB_VALUE);
-	_pwm.setPin(_LED2_PIN_GREEN, _LED_MAX_RGB_VALUE);
-	_pwm.setPin(_LED2_PIN_BLUE, _LED_MAX_RGB_VALUE);
+	digitalWrite(_builtin_led_esp32, LOW);
+	_pwm.setPin(_watchdog_pin_pwmboard, LED_MAX_RGB_VALUE);
+	_pwm.setPin(_led1_pin_red, LED_MAX_RGB_VALUE);
+	_pwm.setPin(_led1_pin_green, LED_MAX_RGB_VALUE);
+	_pwm.setPin(_led1_pin_blue, LED_MAX_RGB_VALUE);
+	_pwm.setPin(_led2_pin_red, LED_MAX_RGB_VALUE);
+	_pwm.setPin(_led2_pin_green, LED_MAX_RGB_VALUE);
+	_pwm.setPin(_led2_pin_blue, LED_MAX_RGB_VALUE);
 }
 
 void RGB_Controller::set_esp32_statusled_on()
 {
 	debug_print("RGB_Controller::set_esp32_statusled_on - run");
-	digitalWrite(_BUILTIN_LED_ESP32, HIGH);
+	digitalWrite(_builtin_led_esp32, HIGH);
 }
 
 void RGB_Controller::set_esp32_statusled_off()
 {
 	debug_print("RGB_Controller::set_esp32_statusled_off - run");
-	digitalWrite(_BUILTIN_LED_ESP32, LOW);
+	digitalWrite(_builtin_led_esp32, LOW);
 }
 
 void RGB_Controller::set_rgbled(int led_nmbr, int rgb_color[3])
 {
 	if (led_nmbr == 1) {
-		_pwm.setPin(_LED1_PIN_RED, rgb_color[0]);
-		_pwm.setPin(_LED1_PIN_GREEN, rgb_color[1]);
-		_pwm.setPin(_LED1_PIN_BLUE, rgb_color[2]);
+		_pwm.setPin(_led1_pin_red, rgb_color[0]);
+		_pwm.setPin(_led1_pin_green, rgb_color[1]);
+		_pwm.setPin(_led1_pin_blue, rgb_color[2]);
 	}
 	else if (led_nmbr == 2) {
-		_pwm.setPin(_LED2_PIN_RED, rgb_color[0]);
-		_pwm.setPin(_LED2_PIN_GREEN, rgb_color[1]);
-		_pwm.setPin(_LED2_PIN_BLUE, rgb_color[2]);
+		_pwm.setPin(_led2_pin_red, rgb_color[0]);
+		_pwm.setPin(_led2_pin_green, rgb_color[1]);
+		_pwm.setPin(_led2_pin_blue, rgb_color[2]);
 	}
 }
 

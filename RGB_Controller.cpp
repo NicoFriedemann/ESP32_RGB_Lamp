@@ -114,14 +114,17 @@ void RGB_Controller::set_esp32_statusled_off()
 void RGB_Controller::set_rgbled(int led_nmbr, int rgb_color[3])
 {
 	if (led_nmbr == 1) {
-		_pwm.setPin(_led1_pin_red, rgb_color[0]);
-		_pwm.setPin(_led1_pin_green, rgb_color[1]);
-		_pwm.setPin(_led1_pin_blue, rgb_color[2]);
+		_pwm.setPin(_led1_pin_red, rgb_color[rgb_red]);
+		_pwm.setPin(_led1_pin_green, rgb_color[rgb_green]);
+		_pwm.setPin(_led1_pin_blue, rgb_color[rgb_blue]);
 	}
 	else if (led_nmbr == 2) {
-		_pwm.setPin(_led2_pin_red, rgb_color[0]);
-		_pwm.setPin(_led2_pin_green, rgb_color[1]);
-		_pwm.setPin(_led2_pin_blue, rgb_color[2]);
+		_pwm.setPin(_led2_pin_red, rgb_color[rgb_red]);
+		_pwm.setPin(_led2_pin_green, rgb_color[rgb_green]);
+		_pwm.setPin(_led2_pin_blue, rgb_color[rgb_blue]);
+	}
+	else {
+		debug_print("RGB_Controller::set_rgbled - led number invalid");
 	}
 }
 
@@ -442,7 +445,7 @@ void RGB_Controller::man_program_hsv(float hsv_colors_man[3])
 	int rgb_colors[3];
 	while (true)
 	{
-		_rgb_util.get_rgb(hsv_colors_man[0], hsv_colors_man[1], hsv_colors_man[2], rgb_colors);
+		_rgb_util.get_rgb(hsv_colors_man[hsv_hue], hsv_colors_man[hsv_saturation], hsv_colors_man[hsv_value], rgb_colors);
 		set_rgbled(1, rgb_colors);
 		set_rgbled(2, rgb_colors);
 		own_delay(1);

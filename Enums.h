@@ -24,14 +24,6 @@ enum e_prog_nmbr {
 	element_count_prog_nmbr,
 };
 
-enum e_udpmsg_type {
-	undefined_udpmsg_type,
-	debug,
-	data,
-	control,
-	element_count_udpmsg_type,
-};
-
 enum e_udpmsg_cmd {
 	undefined_udpmsg_cmd,
 	change_prog,
@@ -52,7 +44,27 @@ enum e_udpmsg_parname {
 	element_count_udpmsg_parname,
 };
 
+enum e_udpmsg_type {
+	undefined_udpmsg_type,
+	json,
+	pos_based_format,
+	element_count_udpmsg_type,
+};
+
+enum e_rgb {
+	rgb_red,
+	rgb_green,
+	rgb_blue,
+};
+
+enum e_hsv {
+	hsv_hue,
+	hsv_saturation,
+	hsv_value,
+};
+
 const int LED_MAX_RGB_VALUE = 4095;
 const int MAX_UDP_CLIENTS = 4;
+const int MAX_WLAN_CONNECT_RETRY = 3;
 
 

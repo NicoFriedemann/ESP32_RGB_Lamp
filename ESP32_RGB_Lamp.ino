@@ -42,7 +42,6 @@ void setup() {
 wl_status_t connect_wlan()
 {
 	int wlan_restart_count = 0;
-	int MAX_WLAN_CONNECT_RETRY = 3;
 	WiFi.mode(WIFI_STA);
 	WiFi.begin(ssid, password);
 	while (WiFi.waitForConnectResult() != WL_CONNECTED) {
@@ -65,6 +64,7 @@ void add_debug_endpoint() {
 	rec.is_active = true;
 	rec.udp_ipaddress_partner = "192.168.178.20";
 	rec.udp_port_partner = 11000;
+	rec.udpmsg_type = e_udpmsg_type::pos_based_format;
 	udp_handler->add_udp_msg_receiver(rec);
 }
 
@@ -112,7 +112,8 @@ void cyclic_tasks() {
 	udp_msg = udp_handler->receive_udp_msg();
 	if (udp_msg.msg != "")
 	{
-		udp_msg_handler->parse_udp_cmd_msg(udp_msg);
+		//udp commands from different sender can have different format
+		udp_msg_handler->parse_udp_cmd_msg(udp_msg, udp_msg.udp_rec.udpmsg_type);
 	}
 	ArduinoOTA.handle();
 }

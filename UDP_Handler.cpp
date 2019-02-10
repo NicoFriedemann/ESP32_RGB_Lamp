@@ -23,13 +23,21 @@ void UDP_Handler::add_udp_msg_receiver(udp_receiver udp_rec)
 				_receiver_list[i].is_active = true;
 				_receiver_list[i].udp_ipaddress_partner = udp_rec.udp_ipaddress_partner;
 				_receiver_list[i].udp_port_partner = udp_rec.udp_port_partner;
+				_receiver_list[i].udpmsg_type = udp_rec.udpmsg_type;
 				debug_print("UDP_Connection::add_udp_msg_receiver - message receiver added!");
 				debug_print("UDP_Connection::add_udp_msg_receiver - receiver-ip: " + _receiver_list[i].udp_ipaddress_partner);
 				debug_print("UDP_Connection::add_udp_msg_receiver - receiver-port: " + (String)_receiver_list[i].udp_port_partner);
+				debug_print("UDP_Connection::add_udp_msg_receiver - msg-type " + (String)_receiver_list[i].udpmsg_type);
 				break;
 			}
 		}
 	}
+}
+
+//todo:implement format detection
+e_udpmsg_type UDP_Handler::get_udp_msg_format(String msg)
+{
+	return e_udpmsg_type::pos_based_format;
 }
 
 udp_message UDP_Handler::receive_udp_msg()
@@ -51,6 +59,7 @@ udp_message UDP_Handler::receive_udp_msg()
 		}
 		udp_msg.udp_rec.udp_ipaddress_partner = _udp_receiver.remoteIP().toString();
 		udp_msg.udp_rec.udp_port_partner = _udp_receiver.remotePort();
+		udp_msg.udp_rec.udpmsg_type = get_udp_msg_format(udp_msg.msg);
 		return udp_msg;
 	}
 }
@@ -59,12 +68,12 @@ void UDP_Handler::send_udp_msg(String header, String msg)
 {
 	if (_wifi.isConnected())
 	{
-		String _msg = UDP_Message_Handler::generate_udp_debug_msg(header, msg);
-		const char *c = _msg.c_str();
 		for (int i = 0; i <= (MAX_UDP_CLIENTS - 1); i++)
 		{
 			if (_receiver_list[i].is_active) {
-				const char* udp_address_partner = _receiver_list[i].udp_ipaddress_partner.c_str();
+				String _msg = UDP_Message_Handler::generate_udp_debug_msg(header, msg, _receiver_list[i].udpmsg_type);
+				const char *c = _msg.c_str();
+				const char *udp_address_partner = _receiver_list[i].udp_ipaddress_partner.c_str();
 				_udp_sender.beginPacket(udp_address_partner, _receiver_list[i].udp_port_partner);
 				_udp_sender.printf(c);
 				_udp_sender.endPacket();

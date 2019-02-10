@@ -1,13 +1,16 @@
 #pragma once
 #include <WiFiUdp.h>
 #include <WiFi.h>
+#include "Enums.h"
 
 struct udp_receiver {
 public:
 	int udp_port_partner;
 	String udp_ipaddress_partner;
+	e_udpmsg_type udpmsg_type;
 	boolean is_active;
 	udp_receiver() {
+		udpmsg_type = e_udpmsg_type::pos_based_format;
 		udp_port_partner = 0;
 		udp_ipaddress_partner = "0.0.0.0";
 		is_active = false;
@@ -34,6 +37,7 @@ public:
 	void add_udp_msg_receiver(udp_receiver udp_rec);
 private:
 	void(*debug_print)(String msg);
+	e_udpmsg_type get_udp_msg_format(String msg);
 	WiFiUDP _udp_sender;
 	WiFiUDP _udp_receiver;
 	WiFiClass _wifi;

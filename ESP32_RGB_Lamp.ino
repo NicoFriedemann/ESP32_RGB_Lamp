@@ -8,18 +8,19 @@
 #include "login_credentials.h"
 #include "UDP_Message_Handler.h"
 
-void debug_print(String msg);
+void debug_print(String msg, e_debug_level e_dl);
 void add_udp_msg_receiver(udp_receiver udp_rec);
 void set_program(e_prog_nmbr program_number, int rgb_colors_man[3], float hsv_colors_man[3]);
 const boolean DEBUG_SERIAL = true;
 const boolean DEBUG_UDP = true;
+const e_debug_level DEBUG_DL = e_debug_level::dl_debug;
 unsigned long cyclictask_last_run = 0;
 UDP_Handler *udp_handler;
 RGB_Controller *rgb;
 UDP_Message_Handler *udp_msg_handler;
 
 void setup() {
-	debug_print("Main::setup - setup started");
+	debug_print("Main::setup - setup started", e_debug_level::dl_info);
 	if (DEBUG_SERIAL) {
 		Serial.begin(115200);
 		delay(1000);
@@ -45,7 +46,7 @@ wl_status_t connect_wlan()
 	WiFi.mode(WIFI_STA);
 	WiFi.begin(ssid, password);
 	while (WiFi.waitForConnectResult() != WL_CONNECTED) {
-		debug_print("Main::connect_wlan - wlan connection failed!");
+		debug_print("Main::connect_wlan - wlan connection failed!", e_debug_level::dl_error);
 		delay(5000);
 		ESP.restart();
 		wlan_restart_count += 1;
@@ -54,7 +55,7 @@ wl_status_t connect_wlan()
 			break;
 		}
 	}
-	debug_print("Main::connect_wlan - connection established!");
+	debug_print("Main::connect_wlan - connection established!", e_debug_level::dl_info);
 	return wl_status_t::WL_CONNECTED;
 }
 
@@ -73,22 +74,22 @@ void start_esp32_ota()
 	if (WiFi.isConnected()) {
 		ArduinoOTA.setPassword("esP32");
 		ArduinoOTA.onStart([]() {
-			debug_print("Main::OTA - start updating");
+			debug_print("Main::OTA - start updating", e_debug_level::dl_info);
 		});
 		ArduinoOTA.onEnd([]() {
-			debug_print("Main::OTA - end updating");
+			debug_print("Main::OTA - end updating", e_debug_level::dl_info);
 		});
 		ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
 			int progress_percent = (progress / (total / 100));
-			debug_print("Main::OTA - progress:" + String(progress_percent) + "%");
+			debug_print("Main::OTA - progress:" + String(progress_percent) + "%", e_debug_level::dl_info);
 		});
 		ArduinoOTA.onError([](ota_error_t error) {
-			debug_print("Main::OTA - Error:" + String(error));
-			if (error == OTA_AUTH_ERROR) debug_print("Main::OTA - auth failed");
-			else if (error == OTA_BEGIN_ERROR) debug_print("Main::OTA - begin failed");
-			else if (error == OTA_CONNECT_ERROR) debug_print("Main::OTA - connect failed");
-			else if (error == OTA_RECEIVE_ERROR) debug_print("Main::OTA - receive failed");
-			else if (error == OTA_END_ERROR) debug_print("Main::OTA - end failed");
+			debug_print("Main::OTA - Error:" + String(error), e_debug_level::dl_error);
+			if (error == OTA_AUTH_ERROR) debug_print("Main::OTA - auth failed", e_debug_level::dl_error);
+			else if (error == OTA_BEGIN_ERROR) debug_print("Main::OTA - begin failed", e_debug_level::dl_error);
+			else if (error == OTA_CONNECT_ERROR) debug_print("Main::OTA - connect failed", e_debug_level::dl_error);
+			else if (error == OTA_RECEIVE_ERROR) debug_print("Main::OTA - receive failed", e_debug_level::dl_error);
+			else if (error == OTA_END_ERROR) debug_print("Main::OTA - end failed", e_debug_level::dl_error);
 		});
 		ArduinoOTA.begin();
 	}
@@ -104,7 +105,7 @@ void own_delay(int milli) {
 
 void cyclic_tasks() {
 	if (cyclictask_last_run <= (millis() - 500)) {
-		debug_print("Main::cyclic_tasks - run");
+		debug_print("Main::cyclic_tasks - run", e_debug_level::dl_info);
 		rgb->cyclic_tasks();
 		cyclictask_last_run = millis();
 	}
@@ -113,18 +114,36 @@ void cyclic_tasks() {
 	if (udp_msg.msg != "")
 	{
 		//udp commands from different sender can have different format
-		udp_msg_handler->parse_udp_cmd_msg(udp_msg, udp_msg.udp_rec.udpmsg_type);
+		udp_msg_handler->parse_udp_cmd_msg(udp_msg);
 	}
 	ArduinoOTA.handle();
 }
 
-void debug_print(String msg)
+void debug_print(String msg, e_debug_level e_dl)
 {
+	String header;
 	if (DEBUG_SERIAL) {
 		Serial.println(msg);
 	}
 	if (DEBUG_UDP) {
-		udp_handler->send_udp_msg("DEBUG", msg);
+		if (e_dl >= DEBUG_DL)
+		{
+			switch (e_dl)
+			{
+			case dl_debug:
+				header = "DEBUG";
+				break;
+			case dl_info:
+				header = "INFO";
+				break;
+			case dl_error:
+				header = "ERROR";
+				break;
+			default:
+				break;
+			}
+			udp_handler->send_udp_msg(header, msg);
+		}
 	}
 }
 

@@ -5,7 +5,7 @@
 
 class RGB_Controller {
 public:
-	RGB_Controller(void (*debug_print_fncptr)(String), void (*own_delay_fncptr)(int),int WATCHDOG_PIN_ESP32,int WATCHDOG_PIN_PWMBOARD,int BUILTIN_LED_ESP32,
+	RGB_Controller(void (*debug_print_fncptr)(String, e_debug_level), void (*own_delay_fncptr)(int),int WATCHDOG_PIN_ESP32,int WATCHDOG_PIN_PWMBOARD,int BUILTIN_LED_ESP32,
 		int LED1_PIN_RED,int LED1_PIN_GREEN,int LED1_PIN_BLUE,int LED2_PIN_RED,int LED2_PIN_GREEN,int LED2_PIN_BLUE);
 	void cyclic_tasks();
 	void set_program(e_prog_nmbr program_number, int rgb_colors_man[3], float hsv_colors_man[3]);
@@ -31,7 +31,7 @@ private:
 	void man_program_blynk(int rgb_colors[3]);
 	void man_program_rgb(int rgb_colors[3]);
 	void man_program_hsv(float hsv_colors_man[3]);
-	void(*debug_print)(String msg);
+	void(*debug_print)(String msg, e_debug_level e_dl);
 	void (*own_delay)(int milli);
 
 	e_prog_nmbr _last_prog_nmbr;

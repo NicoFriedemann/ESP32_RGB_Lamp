@@ -2,6 +2,7 @@
 #include <WiFiUdp.h>
 #include <WiFi.h>
 #include "Enums.h"
+#include <ArduinoJson.h>
 
 struct udp_receiver {
 public:
@@ -29,14 +30,14 @@ public:
 
 class UDP_Handler {
 public:
-	UDP_Handler(void(*debug_print_fncptr)(String), WiFiClass &wifi, int udp_receive_port);
+	UDP_Handler(void(*debug_print_fncptr)(String,e_debug_level), WiFiClass &wifi, int udp_receive_port);
 	void send_udp_msg(String header, String msg);
 	void start_udp_receiver();
 	void stop_udp_receiver();
 	udp_message receive_udp_msg();
 	void add_udp_msg_receiver(udp_receiver udp_rec);
 private:
-	void(*debug_print)(String msg);
+	void(*debug_print)(String msg, e_debug_level e_dl);
 	e_udpmsg_type get_udp_msg_format(String msg);
 	WiFiUDP _udp_sender;
 	WiFiUDP _udp_receiver;

@@ -5,19 +5,22 @@
 
 class UDP_Message_Handler {
 public:
-	UDP_Message_Handler(void (*debug_print_fncptr)(String), void (*set_program_fncptr)(e_prog_nmbr, int[3], float[3]),
+	UDP_Message_Handler(void (*debug_print_fncptr)(String, e_debug_level), void (*set_program_fncptr)(e_prog_nmbr, int[3], float[3]),
 		void(*add_udp_msg_receiver_fncptr)(udp_receiver));
-	void parse_udp_cmd_msg(udp_message msg, e_udpmsg_type udpmsg_type);
+	void parse_udp_cmd_msg(udp_message msg);
 	static String generate_udp_debug_msg(String header, String msg, e_udpmsg_type udpmsg_type);
 
 private:
-	bool validate_command_udpmsg(String msg);
-	bool get_par_name(e_udpmsg_parname &par_name, String &udp_msg);
-	bool get_par_value(float &par_val, String &udp_msg);
-	bool get_cmd(e_udpmsg_cmd & cmd, String & udp_msg);
-	bool get_next_element_udp_msg(String &msg, float &out);
+	e_err verify_command_msg(udp_message udp_msg);
+	e_err get_par(e_udpmsg_parname &par_name, float &par_val, udp_message &udp_msg, int par_pair_nmbr);
+	e_err get_cmd(e_udpmsg_cmd &cmd, udp_message &udp_msg);
+	e_err get_element_json(String msg, String json_key, String &out);
+	e_err get_element_msg(udp_message &udp_msg, String &out, String opt_json_key);
+	e_err get_element_pos_based_format(String &msg, String &out);
+	e_err get_float_from_string(String msg, float &out);
 	int get_char_occurrences_string(String search_string, char charcter);
-	void (*debug_print)(String msg);
+	bool is_number(String msg);
+	void (*debug_print)(String msg, e_debug_level e_dl);
 	void (*set_program)(e_prog_nmbr program_number, int rgb_colors_man[3], float hsv_colors_man[3]);
 	void (*add_udp_msg_receiver)(udp_receiver udp_rec);
 

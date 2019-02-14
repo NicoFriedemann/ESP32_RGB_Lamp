@@ -24,13 +24,16 @@ void UDP_Handler::add_udp_msg_receiver(udp_receiver udp_rec)
 				_receiver_list[i].udp_ipaddress_partner = udp_rec.udp_ipaddress_partner;
 				_receiver_list[i].udp_port_partner = udp_rec.udp_port_partner;
 				_receiver_list[i].udpmsg_type = udp_rec.udpmsg_type;
+				_receiver_list[i].udp_debug_level = udp_rec.udp_debug_level;
 				debug_print("UDP_Connection::add_udp_msg_receiver - message receiver added!", 
 					e_debug_level::dl_info);
 				debug_print("UDP_Connection::add_udp_msg_receiver - receiver-ip: " + _receiver_list[i].udp_ipaddress_partner,
 					e_debug_level::dl_info);
 				debug_print("UDP_Connection::add_udp_msg_receiver - receiver-port: " + (String)_receiver_list[i].udp_port_partner, 
 					e_debug_level::dl_info);
-				debug_print("UDP_Connection::add_udp_msg_receiver - msg-type " + (String)_receiver_list[i].udpmsg_type, 
+				debug_print("UDP_Connection::add_udp_msg_receiver - msg-type: " + (String)_receiver_list[i].udpmsg_type, 
+					e_debug_level::dl_info);
+				debug_print("UDP_Connection::add_udp_msg_receiver - debug-level: " + (String)_receiver_list[i].udp_debug_level,
 					e_debug_level::dl_info);
 				break;
 			}

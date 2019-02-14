@@ -42,6 +42,7 @@ enum e_udpmsg_parname {
 	hue,
 	saturation,
 	value,
+	debug_level,
 	element_count_udpmsg_parname,
 };
 

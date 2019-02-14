@@ -274,6 +274,15 @@ void UDP_Message_Handler::parse_udp_cmd_msg(udp_message udp_msg) {
 				}
 				break;
 			case add_msg_receiver:
+				debug_print("UDP_Message_Handler::parse_udp_cmd_msg - add_msg_receiver", e_debug_level::dl_info);
+				err = get_par(par_name, par_val, udp_msg, 1);
+				if (err == e_err::no_error)
+				{
+					if (par_name==e_udpmsg_parname::debug_level)
+					{
+						udp_msg.udp_rec.udp_debug_level = (e_debug_level)par_val;
+					}
+				}
 				add_udp_msg_receiver(udp_msg.udp_rec);
 			default:
 				debug_print("UDP_Message_Handler::parse_udp_cmd_msg(pos_based_format) - invalid cmd: " + String(cmd), 

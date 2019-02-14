@@ -8,6 +8,7 @@ struct udp_receiver {
 public:
 	int udp_port_partner;
 	String udp_ipaddress_partner;
+	e_debug_level udp_debug_level;
 	e_udpmsg_type udpmsg_type;
 	boolean is_active;
 	udp_receiver() {
@@ -15,6 +16,7 @@ public:
 		udp_port_partner = 0;
 		udp_ipaddress_partner = "0.0.0.0";
 		is_active = false;
+		udp_debug_level = e_debug_level::dl_info;
 	};
 };
 

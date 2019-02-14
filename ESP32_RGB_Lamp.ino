@@ -66,6 +66,7 @@ void add_debug_endpoint() {
 	rec.udp_ipaddress_partner = "192.168.178.20";
 	rec.udp_port_partner = 11000;
 	rec.udpmsg_type = e_udpmsg_type::pos_based_format;
+	rec.udp_debug_level = e_debug_level::dl_debug;
 	udp_handler->add_udp_msg_receiver(rec);
 }
 

@@ -133,10 +133,10 @@ e_err UDP_Message_Handler::get_element_msg(udp_message &udp_msg, String &out, St
 
 e_err UDP_Message_Handler::get_float_from_string(String msg, float &out) {
 	
+	debug_print("UDP_Message_Handler::get_float_from_string - run", e_debug_level::dl_debug);
 	e_err err = e_err::no_error;
 	if (is_number(msg)) {
 		out = msg.toFloat();
-		debug_print("UDP_Message_Handler::get_float_from_string - msg: " + msg + ",float: " + (String)out, e_debug_level::dl_debug);
 	}
 	else {
 		out = 0.0;
@@ -188,7 +188,7 @@ e_err UDP_Message_Handler::get_par(e_udpmsg_parname &par_name, float &par_val, u
 	if (get_element_msg(udp_msg, s_temp_cmd, C_JSON_PARNAME + par_pair_nmbr) == e_err::no_error)
 	{
 		err = get_float_from_string(s_temp_cmd, f_temp_cmd);
-		if (err == e_err::no_error && f_temp_cmd <= e_udpmsg_cmd::element_count_udpmsg_cmd)
+		if (err == e_err::no_error && f_temp_cmd <= e_udpmsg_parname::element_count_udpmsg_parname)
 		{
 			par_name = e_udpmsg_parname(f_temp_cmd);
 			if (get_element_msg(udp_msg, s_temp_cmd, C_JSON_PARVAL + par_pair_nmbr) == e_err::no_error)
@@ -275,6 +275,7 @@ void UDP_Message_Handler::parse_udp_cmd_msg(udp_message udp_msg) {
 				break;
 			case add_msg_receiver:
 				debug_print("UDP_Message_Handler::parse_udp_cmd_msg - add_msg_receiver", e_debug_level::dl_info);
+				//get debug_level
 				err = get_par(par_name, par_val, udp_msg, 1);
 				if (err == e_err::no_error)
 				{
@@ -283,9 +284,19 @@ void UDP_Message_Handler::parse_udp_cmd_msg(udp_message udp_msg) {
 						udp_msg.udp_rec.udp_debug_level = (e_debug_level)par_val;
 					}
 				}
+				//get remote listening port
+				err = get_par(par_name, par_val, udp_msg, 2);
+				if (err == e_err::no_error)
+				{
+					if (par_name == e_udpmsg_parname::port)
+					{
+						udp_msg.udp_rec.udp_port_partner = (int)par_val;
+					}
+				}
 				add_udp_msg_receiver(udp_msg.udp_rec);
+				break;
 			default:
-				debug_print("UDP_Message_Handler::parse_udp_cmd_msg(pos_based_format) - invalid cmd: " + String(cmd), 
+				debug_print("UDP_Message_Handler::parse_udp_cmd_msg - invalid cmd: " + String(cmd), 
 					e_debug_level::dl_error);
 				break;
 			}

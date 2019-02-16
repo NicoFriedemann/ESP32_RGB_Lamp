@@ -43,6 +43,7 @@ enum e_udpmsg_parname {
 	saturation,
 	value,
 	debug_level,
+	port,
 	element_count_udpmsg_parname,
 };
 

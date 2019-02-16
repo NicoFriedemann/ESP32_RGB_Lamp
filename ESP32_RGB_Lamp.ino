@@ -11,6 +11,9 @@
 void debug_print(String msg, e_debug_level e_dl);
 void add_udp_msg_receiver(udp_receiver udp_rec);
 void set_program(e_prog_nmbr program_number, int rgb_colors_man[3], float hsv_colors_man[3]);
+int ota_progress = 0;
+int ota_progress_old = 0;
+bool setup_finished = false;
 const boolean DEBUG_SERIAL = true;
 const boolean DEBUG_UDP = true;
 const e_debug_level DEBUG_DL = e_debug_level::dl_debug;
@@ -33,7 +36,7 @@ void setup() {
 	{
 		start_esp32_ota();
 		udp_handler->start_udp_receiver();
-		add_debug_endpoint();
+		setup_finished = true;
 	}
 
 	rgb->set_program((e_prog_nmbr)random(1, 9));
@@ -59,17 +62,6 @@ wl_status_t connect_wlan()
 	return wl_status_t::WL_CONNECTED;
 }
 
-//add first debug endpoint
-void add_debug_endpoint() {
-	udp_receiver rec;
-	rec.is_active = true;
-	rec.udp_ipaddress_partner = "192.168.178.20";
-	rec.udp_port_partner = 11000;
-	rec.udpmsg_type = e_udpmsg_type::pos_based_format;
-	rec.udp_debug_level = e_debug_level::dl_debug;
-	udp_handler->add_udp_msg_receiver(rec);
-}
-
 void start_esp32_ota()
 {
 	if (WiFi.isConnected()) {
@@ -81,8 +73,12 @@ void start_esp32_ota()
 			debug_print("Main::OTA - end updating", e_debug_level::dl_info);
 		});
 		ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
-			int progress_percent = (progress / (total / 100));
-			debug_print("Main::OTA - progress:" + String(progress_percent) + "%", e_debug_level::dl_info);
+			ota_progress = (progress / (total / 100));
+			if (ota_progress > ota_progress_old)
+			{
+				ota_progress_old = ota_progress;
+				debug_print("Main::OTA - progress:" + String(ota_progress) + "%", e_debug_level::dl_info);
+			}
 		});
 		ArduinoOTA.onError([](ota_error_t error) {
 			debug_print("Main::OTA - Error:" + String(error), e_debug_level::dl_error);
@@ -114,37 +110,19 @@ void cyclic_tasks() {
 	udp_msg = udp_handler->receive_udp_msg();
 	if (udp_msg.msg != "")
 	{
-		//udp commands from different sender can have different format
 		udp_msg_handler->parse_udp_cmd_msg(udp_msg);
 	}
 	ArduinoOTA.handle();
 }
 
-void debug_print(String msg, e_debug_level e_dl)
+void debug_print(String msg, e_debug_level dl)
 {
 	String header;
 	if (DEBUG_SERIAL) {
 		Serial.println(msg);
 	}
-	if (DEBUG_UDP) {
-		if (e_dl >= DEBUG_DL)
-		{
-			switch (e_dl)
-			{
-			case dl_debug:
-				header = "DEBUG";
-				break;
-			case dl_info:
-				header = "INFO";
-				break;
-			case dl_error:
-				header = "ERROR";
-				break;
-			default:
-				break;
-			}
-			udp_handler->send_udp_msg(header, msg);
-		}
+	if (DEBUG_UDP && setup_finished) {
+		udp_handler->send_debug_msg(msg,dl);
 	}
 }
 

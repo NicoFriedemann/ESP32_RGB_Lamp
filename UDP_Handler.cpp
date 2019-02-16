@@ -7,36 +7,32 @@ UDP_Handler::UDP_Handler(void(*debug_print_fncptr)(String,e_debug_level), WiFiCl
 	_wifi = wifi;
 	_udp_port_receive = udp_receive_port;
 	_udp_receiver_started = false;
-	debug_print("UDP_Connection::UDP_Connection - constructor", e_debug_level::dl_info);
+	debug_print("UDP_Handler::UDP_Handler - constructor", e_debug_level::dl_info);
 }
 
 void UDP_Handler::add_udp_msg_receiver(udp_receiver udp_rec)
 {
-	debug_print("UDP_Connection::add_udp_msg_receiver - run", e_debug_level::dl_error);
+	debug_print("UDP_Handler::add_udp_msg_receiver - run", e_debug_level::dl_error);
 	for (int i = 0; i <= (MAX_UDP_CLIENTS - 1); i++)
 	{
 		//receiver already registered?
-		if (_receiver_list[i].udp_ipaddress_partner != udp_rec.udp_ipaddress_partner) {
-			//receiver entry is not active (empty)
-			if (!_receiver_list[i].is_active)
-			{
-				_receiver_list[i].is_active = true;
-				_receiver_list[i].udp_ipaddress_partner = udp_rec.udp_ipaddress_partner;
-				_receiver_list[i].udp_port_partner = udp_rec.udp_port_partner;
-				_receiver_list[i].udpmsg_type = udp_rec.udpmsg_type;
-				_receiver_list[i].udp_debug_level = udp_rec.udp_debug_level;
-				debug_print("UDP_Connection::add_udp_msg_receiver - message receiver added!", 
-					e_debug_level::dl_info);
-				debug_print("UDP_Connection::add_udp_msg_receiver - receiver-ip: " + _receiver_list[i].udp_ipaddress_partner,
-					e_debug_level::dl_info);
-				debug_print("UDP_Connection::add_udp_msg_receiver - receiver-port: " + (String)_receiver_list[i].udp_port_partner, 
-					e_debug_level::dl_info);
-				debug_print("UDP_Connection::add_udp_msg_receiver - msg-type: " + (String)_receiver_list[i].udpmsg_type, 
-					e_debug_level::dl_info);
-				debug_print("UDP_Connection::add_udp_msg_receiver - debug-level: " + (String)_receiver_list[i].udp_debug_level,
-					e_debug_level::dl_info);
-				break;
-			}
+		if ((_receiver_list[i].udp_ipaddress_partner == "0.0.0.0" && !_receiver_list[i].is_active) || _receiver_list[i].udp_ipaddress_partner == udp_rec.udp_ipaddress_partner) {
+			_receiver_list[i].is_active = true;
+			_receiver_list[i].udp_ipaddress_partner = udp_rec.udp_ipaddress_partner;
+			_receiver_list[i].udp_port_partner = udp_rec.udp_port_partner;
+			_receiver_list[i].udpmsg_type = udp_rec.udpmsg_type;
+			_receiver_list[i].udp_debug_level = udp_rec.udp_debug_level;
+			debug_print("UDP_Handler::add_udp_msg_receiver - message receiver added!", 
+				e_debug_level::dl_info);
+			debug_print("UDP_Handler::add_udp_msg_receiver - receiver-ip: " + _receiver_list[i].udp_ipaddress_partner,
+				e_debug_level::dl_info);
+			debug_print("UDP_Handler::add_udp_msg_receiver - receiver-port: " + (String)_receiver_list[i].udp_port_partner, 
+				e_debug_level::dl_info);
+			debug_print("UDP_Handler::add_udp_msg_receiver - msg-type: " + (String)_receiver_list[i].udpmsg_type, 
+				e_debug_level::dl_info);
+			debug_print("UDP_Handler::add_udp_msg_receiver - debug-level: " + (String)_receiver_list[i].udp_debug_level,
+				e_debug_level::dl_info);
+			break;
 		}
 	}
 }
@@ -76,7 +72,7 @@ udp_message UDP_Handler::receive_udp_msg()
 				packetBuffer[len] = 0;
 			}
 			udp_msg.msg = String(packetBuffer);
-			debug_print("UDP_Connection::receive_udp_msg - msg received:" + udp_msg.msg, e_debug_level::dl_debug);
+			debug_print("UDP_Handler::receive_udp_msg - msg received:" + udp_msg.msg, e_debug_level::dl_debug);
 		}
 		udp_msg.udp_rec.udp_ipaddress_partner = _udp_receiver.remoteIP().toString();
 		udp_msg.udp_rec.udp_port_partner = _udp_receiver.remotePort();
@@ -85,20 +81,40 @@ udp_message UDP_Handler::receive_udp_msg()
 	}
 }
 
-void UDP_Handler::send_udp_msg(String header, String msg)
+void UDP_Handler::send_udp_msg(String msg, udp_receiver udp_rec)
 {
 	if (_wifi.isConnected())
 	{
-		for (int i = 0; i <= (MAX_UDP_CLIENTS - 1); i++)
-		{
-			if (_receiver_list[i].is_active) {
-				String _msg = UDP_Message_Handler::generate_udp_debug_msg(header, msg, _receiver_list[i].udpmsg_type);
-				const char *c = _msg.c_str();
-				const char *udp_address_partner = _receiver_list[i].udp_ipaddress_partner.c_str();
-				_udp_sender.beginPacket(udp_address_partner, _receiver_list[i].udp_port_partner);
-				_udp_sender.printf(c);
-				_udp_sender.endPacket();
+		const char *c = msg.c_str();
+		const char *udp_address_partner = udp_rec.udp_ipaddress_partner.c_str();
+		_udp_sender.beginPacket(udp_address_partner, udp_rec.udp_port_partner);
+		_udp_sender.printf(c);
+		_udp_sender.endPacket();
+	}
+}
+
+void UDP_Handler::send_debug_msg(String msg, e_debug_level dl) 
+{
+	for (int i = 0; i <= (MAX_UDP_CLIENTS - 1); i++)
+	{
+		if (_receiver_list[i].is_active && (int)dl >= (int)_receiver_list->udp_debug_level) {
+			String header;
+			switch (dl)
+			{
+			case dl_debug:
+				header = "DEBUG";
+				break;
+			case dl_info:
+				header = "INFO";
+				break;
+			case dl_error:
+				header = "ERROR";
+				break;
+			default:
+				break;
 			}
+			String _msg = UDP_Message_Handler::generate_udp_debug_msg(header, msg, _receiver_list[i].udpmsg_type);
+			send_udp_msg(_msg, _receiver_list[i]);
 		}
 	}
 }

@@ -33,7 +33,8 @@ public:
 class UDP_Handler {
 public:
 	UDP_Handler(void(*debug_print_fncptr)(String,e_debug_level), WiFiClass &wifi, int udp_receive_port);
-	void send_udp_msg(String header, String msg);
+	void send_udp_msg(String msg, udp_receiver udp_rec);
+	void send_debug_msg(String msg, e_debug_level dl);
 	void start_udp_receiver();
 	void stop_udp_receiver();
 	udp_message receive_udp_msg();
